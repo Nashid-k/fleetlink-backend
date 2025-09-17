@@ -25,3 +25,36 @@ export const getAvailableVehicles = async (req, res) => {
         res.status(500).json({message:error.message});
     }
 }
+
+
+export const bookVehicle = async (req, res) => {
+    try {
+        const {vehicleId, fromPincode, toPincode, startTime, customerId} = req.body;
+
+        const vehicle = await Vehicle.findById(vehicleId);
+        if(!vehicle) return res.status(404).json({messge:"Vehicle not found"});
+
+        const start = new Date(startTime);
+        const duration = calculateDuration(fromPincode, toPincode);
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+        const conflict = await Booking.findOne({
+            vehicleId,
+            $or:[{startTime: {$lt: end}, endTime:{ $gt: start}}]
+        });
+
+        if(conflict) return res.status(400).json({messge:"Vehicle already booked"});
+
+        const booking = await Booking.create({
+            vehicleId,
+            fromPincode,
+            toPincode,
+            startTime : start,
+            endTime : end,
+            customerId
+        });
+        res.status(201).json(booking);
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}
