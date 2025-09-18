@@ -1,4 +1,3 @@
-// controllers/bookingController.js
 import Booking from "../models/Booking.js";
 import Vehicle from "../models/Vehicle.js";
 import { calculateDuration } from "../utils/calculateDuration.js";
@@ -7,11 +6,16 @@ export const getAvailableVehicles = async (req, res) => {
   try {
     const { capacityRequired, fromPincode, toPincode, startTime } = req.query;
 
+   
+    const capacity = Number(capacityRequired);
+    const fromPin = Number(fromPincode);
+    const toPin = Number(toPincode);
+
     const start = new Date(startTime);
-    const duration = calculateDuration(fromPincode, toPincode);
+    const duration = calculateDuration(fromPin, toPin);
     const end = new Date(start.getTime() + duration * 60 * 60 * 1000);
 
-    const vehicles = await Vehicle.find({ capacityKg: { $gte: capacityRequired } });
+    const vehicles = await Vehicle.find({ capacityKg: { $gte: capacity } });
     const bookings = await Booking.find({
       $or: [
         { startTime: { $lt: end }, endTime: { $gt: start } }
