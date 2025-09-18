@@ -5,70 +5,40 @@ import Vehicle from '../models/Vehicle.js';
 vi.mock('../models/Vehicle.js');
 
 describe('Vehicle Controller', () => {
-  let mockReq, mockRes;
+  let req, res;
 
   beforeEach(() => {
-    mockReq = { body: {} };
-    mockRes = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn()
-    };
+    req = { body: {} };
+    res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
     vi.clearAllMocks();
   });
 
   describe('addVehicle', () => {
-    it('should create a new vehicle', async () => {
-      const mockVehicle = {
-        _id: '1',
-        name: 'Truck A',
-        capacityKg: 1000,
-        tyres: 6
-      };
-
-      mockReq.body = {
-        name: 'Truck A',
-        capacityKg: 1000,
-        tyres: 6
-      };
-
+    it('creates a new vehicle', async () => {
+      const mockVehicle = { _id: '1', name: 'Truck A', capacityKg: 1000, tyres: 6 };
+      req.body = { name: 'Truck A', capacityKg: 1000, tyres: 6 };
       Vehicle.create.mockResolvedValue(mockVehicle);
 
-      await addVehicle(mockReq, mockRes);
+      await addVehicle(req, res);
 
-      expect(Vehicle.create).toHaveBeenCalledWith({
-        name: 'Truck A',
-        capacityKg: 1000,
-        tyres: 6
-      });
-      expect(mockRes.status).toHaveBeenCalledWith(201);
-      expect(mockRes.json).toHaveBeenCalledWith(mockVehicle);
+      expect(Vehicle.create).toHaveBeenCalledWith(req.body);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockVehicle);
     });
 
-    it('should return 400 if missing required fields', async () => {
-      mockReq.body = {
-        name: 'Truck A'
-        // Missing capacityKg and tyres
-      };
-
-      await addVehicle(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Fill all details' });
+    it('returns 400 if missing fields', async () => {
+      req.body = { name: 'Truck A' }; 
+      await addVehicle(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Fill all details' });
     });
 
-    it('should handle errors', async () => {
-      mockReq.body = {
-        name: 'Truck A',
-        capacityKg: 1000,
-        tyres: 6
-      };
-
-      Vehicle.create.mockRejectedValue(new Error('Database error'));
-
-      await addVehicle(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Database error' });
+    it('handles errors', async () => {
+      req.body = { name: 'Truck A', capacityKg: 1000, tyres: 6 };
+      Vehicle.create.mockRejectedValue(new Error('DB error'));
+      await addVehicle(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'DB error' });
     });
   });
 });
