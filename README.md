@@ -1,5 +1,3 @@
-Here’s a **simple README** you can use for your Git repo. It’s short, clear, and covers setup, usage, and testing:
-
 ````markdown
 # Vehicle Booking Backend
 
@@ -89,7 +87,4 @@ MIT
 
 ```
 
-This is simple but **fully informative** for anyone cloning your repo.  
 
-If you want, I can also make a **slightly fancier version with examples of request/response payloads** for clarity. Do you want me to do that?
-```
